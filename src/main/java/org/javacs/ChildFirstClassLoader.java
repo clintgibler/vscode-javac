@@ -3,6 +3,7 @@ package org.javacs;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URI;
 import java.net.URLClassLoader;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -29,8 +30,11 @@ class ChildFirstClassLoader extends URLClassLoader {
     private static URL parse(String urlString) {
         try {
             if (urlString.startsWith("/")) return Paths.get(urlString).toUri().toURL();
+            else if (!urlString.startsWith("http") && new File(urlString).exists()) return new URI("file", urlString, "").toURL();
             else return new URL(urlString);
         } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        } catch (java.net.URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }
